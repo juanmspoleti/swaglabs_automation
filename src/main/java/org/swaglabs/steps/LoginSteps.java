@@ -1,6 +1,5 @@
 package org.swaglabs.steps;
 
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.swaglabs.views.LoginView;
@@ -11,13 +10,7 @@ public class LoginSteps {
     private final String LOGIN_NOT_DISPLAYED_MESSAGE = "Login view is not displayed.";
     private LoginView loginView;
 
-    @Given("The user is located in swaglabs login page")
-    public void goToLoginPage() {
-        getLoginView().goToBaseUrl();
-        Assert.assertTrue(getLoginView().isLoginDisplayed(), LOGIN_NOT_DISPLAYED_MESSAGE);
-    }
-
-    @When("The user do the login process with '(.*)' and '(.*)'")
+    @When("do the login process with {string} and {string}")
     public void doLoginProcess(String email, String password) {
         LoginView loginView = getLoginView();
         loginView.setEmail(email);
@@ -25,9 +18,14 @@ public class LoginSteps {
         loginView.clickSignIn();
     }
 
-    @Then("The message '(.*)' is displayed in login view")
+    @Then("message {string} is displayed in login view")
     public void isErrorMessageDisplayed(String message) {
         Assert.assertEquals(getLoginView().getErrorMessage(), message);
+    }
+
+    @Then("login view is displayed")
+    public void isLoginPageDisplayed() {
+        Assert.assertTrue(getLoginView().isViewDisplayed(), LOGIN_NOT_DISPLAYED_MESSAGE);
     }
 
     private LoginView getLoginView() {

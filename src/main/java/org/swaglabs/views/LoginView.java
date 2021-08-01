@@ -1,32 +1,40 @@
 package org.swaglabs.views;
 
-import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.swaglabs.views.common.ViewBase;
 
 public class LoginView extends ViewBase {
 
-    private final String USERNAME_INPUT_ID = "user-name";
-    private final String PASSWORD_INPUT_ID = "password";
-    private final String SIGN_IN_BUTTON_ID = "login-button";
-    private final String ERROR_MESSAGE_LABEL_CSS = "h3[data-test='error']";
+    @FindBy(id = "user-name")
+    private WebElement usernameInput;
+
+    @FindBy(id = "password")
+    private WebElement passwordInput;
+
+    @FindBy(id = "login-button")
+    private WebElement signInButton;
+
+    @FindBy(css = "h3[data-test='error']")
+    private WebElement errorMessageLabel;
 
     public String getErrorMessage() {
-        return getText(By.cssSelector(ERROR_MESSAGE_LABEL_CSS));
+        return getText(errorMessageLabel);
     }
 
     public void setEmail(String email) {
-        setInput(By.id(USERNAME_INPUT_ID), email);
+        setInput(usernameInput, email);
     }
 
     public void setPassword(String password) {
-        setInput(By.id(PASSWORD_INPUT_ID), password);
+        setInput(passwordInput, password);
     }
 
     public void clickSignIn() {
-        click(By.id(SIGN_IN_BUTTON_ID));
+        click(signInButton);
     }
 
-    public boolean isLoginDisplayed() {
-        return isPresent(By.id(USERNAME_INPUT_ID));
+    public boolean isViewDisplayed() {
+        return isVisible(usernameInput);
     }
 }

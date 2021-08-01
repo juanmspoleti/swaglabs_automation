@@ -7,21 +7,23 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.swaglabs.core.DriverService;
+import org.swaglabs.core.PropertyManager;
 
 public class Hooks {
 
     @Before
     public void beforeScenario(Scenario scenario) {
         Logger.getLogger(getClass()).info(">>>Running scenario: ".concat(scenario.getName()));
+        DriverService.getInstance().get(PropertyManager.getProperty("base.url"));
     }
 
     @After
     public void afterScenario(Scenario scenario) {
         if (scenario.isFailed()) {
             scenario.embed(((TakesScreenshot) DriverService
-                    .getDriverInstance()).getScreenshotAs(OutputType.BYTES), "image/png");
+                    .getInstance()).getScreenshotAs(OutputType.BYTES), "image/png");
         }
         Logger.getLogger(getClass()).info(">>>Ending scenario: ".concat(scenario.getName()));
-        DriverService.dismissDriver();
+        DriverService.dismiss();
     }
 }

@@ -1,51 +1,47 @@
 package org.swaglabs.views.common;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.swaglabs.core.DriverService;
 import org.swaglabs.core.PropertyManager;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public abstract class ViewBase {
 
-    public WebElement getElement(By locator) {
-        return DriverService.getDriverInstance().findElement(locator);
+    public ViewBase() {
+        PageFactory.initElements(DriverService.getInstance(), this);
     }
 
-    public String getText(By locator){
-        WebElement element = getElement(locator);
-        return getText(element);
+    private ThreadLocal<FluentWait<WebElement>> fluentWait = new ThreadLocal<>();
+
+    public FluentWait getFluentWait() {
+        if (fluentWait.get() == null) {
+            long timeout = Long.parseLong(PropertyManager.getProperty("element.timeout"));
+            fluentWait.set(new FluentWait(DriverService.getInstance()).withTimeout(Duration.ofSeconds(timeout))
+                    .pollingEvery(Duration.ofMillis(500L)).ignoring(NoSuchElementException.class));
+        }
+        return fluentWait.get();
     }
 
-    public String getText(WebElement element){
+    public String getText(WebElement element) {
         return element.getText();
     }
 
-    public void setInput(By locator, String value) {
-        WebElement element = getElement(locator);
+    public void setInput(WebElement element, String value) {
         element.sendKeys(value);
     }
 
-    public void click(By locator) {
-        WebElement element = getElement(locator);
+    public void click(WebElement element) {
+        getFluentWait().until(ExpectedConditions.elementToBeClickable(element));
         element.click();
     }
 
-    public boolean isPresent(By locator) {
-        DriverService.getDriverInstance().manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            getElement(locator);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        } finally {
-            DriverService.getDriverInstance().manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-        }
-    }
-
-    public void goToBaseUrl(){
-        DriverService.getDriverInstance().get(PropertyManager.getProperty("base.url"));
+    public boolean isVisible(WebElement element) {
+        return element.isDisplayed();
     }
 }

@@ -10,10 +10,10 @@ public class PropertyManager {
 
     private static final String PROPERTY_FILE_NAME = "config.properties";
 
-    private static Properties properties;
+    private static final ThreadLocal<Properties> properties = new ThreadLocal<>();
 
     private static Properties getProperties() {
-        if (properties == null) {
+        if (properties.get() == null) {
             try {
                 loadProperties();
             } catch (IOException e) {
@@ -21,7 +21,7 @@ public class PropertyManager {
                 throw new RuntimeException("Properties file could not be loaded");
             }
         }
-        return properties;
+        return properties.get();
     }
 
     public static String getProperty(String propertyKey) {
@@ -29,8 +29,8 @@ public class PropertyManager {
     }
 
     private static void loadProperties() throws IOException {
-        properties = new Properties();
+        properties.set(new Properties());
         InputStream inputStream = PropertyManager.class.getClassLoader().getResourceAsStream(PROPERTY_FILE_NAME);
-        properties.load(inputStream);
+        properties.get().load(inputStream);
     }
 }
